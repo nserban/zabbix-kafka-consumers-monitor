@@ -1,5 +1,10 @@
 # zabbix-kafka-consumers-monitor
-Monitor Kafka Consumer groups in Zabbix using Python 
+Monitor Kafka Consumer groups in Zabbix using Python
+
+Information about Kafka Consumers groups and consumers LAG are retrieved using Kafka API. ( [Kafka API Documentation](https://cwiki.apache.org/confluence/display/KAFKA/A+Guide+To+The+Kafka+Protocol#AGuideToTheKafkaProtocol) 
+)
+
+This monitoring tool is working for Kafka Broker version > 0.9.0 and consumers that are using Consumer API which are committing the offset into Kafka.
 
 ### Usage
 Install kafka-python
