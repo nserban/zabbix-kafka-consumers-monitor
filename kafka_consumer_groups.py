@@ -81,13 +81,13 @@ class KafkaConsumerGroups:
                 metadata_consumer_group['topics'] += member_topics_assignment
                 (lag_total, topics_found) = self.get_lag(group_name,
                                                          topics=metadata_consumer_group['topics'])
-                metadata_consumer_group['lag'] = lag_total
+                metadata_consumer_group['lag'] = metadata_consumer_group['lag'] + lag_total
         elif check_without_members:
             all_topics = self.client.cluster.topics()
             while '__consumer_offsets' in all_topics: all_topics.remove('__consumer_offsets')
             (lag_total, topics_found) = self.get_lag(group_name, topics=all_topics)
 
-            metadata_consumer_group['lag'] = lag_total
+            metadata_consumer_group['lag'] = metadata_consumer_group['lag'] + lag_total
             metadata_consumer_group['topics'] = topics_found
 
         return metadata_consumer_group
