@@ -28,8 +28,6 @@ parser.add_argument('--group', required=False, dest="consumer_group", default=No
                     help='Consumer group name')
 parser.add_argument('--timeout', required=False, dest="timeout", default=5000,
                     help='Kafka API timeout in ms')
-parser.add_argument('--check_without_members', required=False, dest="check_without_members", default=False,
-                    help='Describe consumer groups without members.')
 
 args = parser.parse_args()
 
@@ -39,7 +37,6 @@ list_groups = args.list
 lag = args.lag
 members = args.members
 group = args.consumer_group
-check_without_members = args.check_without_members
 
 if list_groups is True:
     cg = KafkaConsumerGroups(bootstrap_server, timeout)
@@ -52,13 +49,13 @@ if list_groups is True:
 elif lag is True and group is not None:
     cg = KafkaConsumerGroups(bootstrap_server, timeout)
     l = cg.list()
-    g = cg.describe(node_id=l[group], group_name=group, check_without_members=check_without_members)
+    g = cg.describe(node_id=l[group], group_name=group, check_lag=True)
     print(g["lag"])
 elif members is True and group is not None:
     cg = KafkaConsumerGroups(bootstrap_server, timeout)
     l = cg.list()
-    g = cg.describe(node_id=l[group], group_name=group, check_without_members=check_without_members)
-    print(len(g["members"]))
+    g = cg.describe(node_id=l[group], group_name=group, check_lag=False)
+    print(g)
 else:
     print("One of the options list or describe are mandatory. Please see help.")
     exit(1)

@@ -50,7 +50,7 @@ class KafkaConsumerGroups:
 
         return consumers_grp
 
-    def describe(self, node_id, group_name, check_without_members=False):
+    def describe(self, node_id, group_name, check_lag=False):
         describe_groups_request = admin.DescribeGroupsRequest_v0(
             groups=[(group_name)]
         )
@@ -67,6 +67,10 @@ class KafkaConsumerGroups:
 
         metadata_consumer_group = {'id': group_name, 'state': state, 'topics': [], 'lag': 0, 'members': []}
 
+        if not check_lag:
+            metadata_consumer_group = len(members)
+            return metadata_consumer_group
+            
         if len(members) != 0:
             for member in members:
                 (member_id, client_id, client_host, member_metadata, member_assignment) = member
@@ -82,13 +86,6 @@ class KafkaConsumerGroups:
                 (lag_total, topics_found) = self.get_lag(group_name,
                                                          topics=metadata_consumer_group['topics'])
                 metadata_consumer_group['lag'] = metadata_consumer_group['lag'] + lag_total
-        elif check_without_members:
-            all_topics = self.client.cluster.topics()
-            while '__consumer_offsets' in all_topics: all_topics.remove('__consumer_offsets')
-            (lag_total, topics_found) = self.get_lag(group_name, topics=all_topics)
-
-            metadata_consumer_group['lag'] = metadata_consumer_group['lag'] + lag_total
-            metadata_consumer_group['topics'] = topics_found
 
         return metadata_consumer_group
 
