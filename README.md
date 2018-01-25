@@ -17,14 +17,19 @@ Zabbix Consumer groups discovery
 python monitor_consumers.py --bootstrap-server <kafka_broker_list> --list 
 ```
 
+Check if a consumer group exists
+```bash
+python monitor_consumers.py --bootstrap-server <kafka-broker-list> --group <consumer-group> --is-present
+```
+
 Get Lag for a specific consumer group
 ```bash
-python monitor_consumers.py --bootstrap-server <kafka-broker-list> --lag --group <consumer-group> 
+python monitor_consumers.py --bootstrap-server <kafka-broker-list> --group <consumer-group> --lag
 ```
 
 Get number of consumers from a group
 ```bash
-python monitor_consumers.py --bootstrap-server <kafka-broker-list> --members --group <consumer-group> 
+python monitor_consumers.py --bootstrap-server <kafka-broker-list> --group <consumer-group> --members
 ```
 
 ### All possible arguments
@@ -36,11 +41,9 @@ optional arguments:
   --bootstrap-server BOOTSTRAP_SERVER
                         Kafka brokers list
   --list                List Kafka Consumer Groups
-  --lag                 Lag consumer group
-  --members             Members consumer group
-  --group CONSUMER_GROUP
-                        Consumer group name
+  --group               CONSUMER_GROUP
+      --lag                 Lag consumer group
+      --members             Members consumer group
+      --is-present          Check if a consumer group exists
   --timeout TIMEOUT     Kafka API timeout in ms
-  --check_without_members CHECK_WITHOUT_MEMBERS
-                        Describe consumer groups without members.
 ```
