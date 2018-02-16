@@ -43,7 +43,7 @@ parser.add_argument('--ssl-certfile', dest='ssl_certfile', required=False, defau
                     help='optional filename of file in pem format containing the client certificate. Default: None')
 parser.add_argument('--ssl-keyfile', dest='ssl_keyfile', required=False, default=None,
                     help='optional filename containing the client private key. Default: None')
-parser.add_argument('--nocheckcertificate', dest='ssl_no_check_certificate', required=False, default=None,
+parser.add_argument('--nocheckcertificate', dest='ssl_no_check_certificate', action='store_true', required=False, default=False,
                     help='Whether to try to verify other peers certificates and how to behave if verification fails. Valid values are: True, False. Default: None')
 
 
@@ -68,9 +68,6 @@ ssl_no_check_certificate = args.ssl_no_check_certificate
 if ssl_no_check_certificate is True:
     ssl_context.check_hostname = False
     ssl_context.verify_mode = ssl.CERT_NONE
-else:
-    ssl_context.check_hostname = True
-    ssl_context.verify_mode = ssl.CERT_REQUIRED
 
 if list_groups is True:
     if security_protocol in ['SASL_PLAINTEXT', 'SASL_SSL']:
