@@ -31,22 +31,20 @@ parser.add_argument('--is-present', dest='is_present', action='store_true', requ
                     help='Check if a consumer group exists')
 parser.add_argument('--timeout', required=False, dest="timeout", default=5000,
                     help='Kafka API timeout in ms')
-parser.add_argument('--security-protocol', dest='security_protocol', required=False, default='PLAINTEXT',
-                    help='Protocol used to communicate with brokers. Valid values are: PLAINTEXT, SSL. Default: PLAINTEXT.')
+parser.add_argument('--security-protocol', dest='security_protocol', required=False, default=None,
+                    help='Protocol used to communicate with brokers. Valid values are: SSL, SASL_PLAINTEXT, SASL_SSL. Default: None')
 parser.add_argument('--sasl-mechanism', dest='sasl_mechanism', required=False, default=None,
-                    help='string picking sasl mechanism when security_protocol is SASL_PLAINTEXT or SASL_SSL. Currently only PLAIN is supported. Default: None')
+                    help='string picking sasl mechanism when security_protocol is SASL_PLAINTEXT or SASL_SSL. Valid value are: PLAIN. Default: None')
 parser.add_argument('--sasl-plain-username', dest='sasl_plain_username', required=False, default=None,
                     help='username for sasl PLAIN authentication')
 parser.add_argument('--sasl-plain-password', dest='sasl_plain_password', required=False, default=None,
                     help='password for sasl PLAIN authentication. Default: None')
-parser.add_argument('--ssl-check-hostname', dest='ssl_check_hostname', required=False, default=True,
-                    help='flag to configure whether ssl handshake should verify that the certificate matches the brokers hostname. default: true')
-parser.add_argument('--ssl-cafile', dest='ssl_cafile', required=False, default=None,
-                    help='flag to configure whether ssl handshake should verify that the certificate matches the brokers hostname. default: true')
 parser.add_argument('--ssl-certfile', dest='ssl_certfile', required=False, default=None,
-                    help='flag to configure whether ssl handshake should verify that the certificate matches the brokers hostname. default: true')
+                    help='optional filename of file in pem format containing the client certificate. Default: None')
 parser.add_argument('--ssl-keyfile', dest='ssl_keyfile', required=False, default=None,
-                    help='flag to configure whether ssl handshake should verify that the certificate matches the brokers hostname. default: true')
+                    help='optional filename containing the client private key. Default: None')
+parser.add_argument('--ssl-verify-mode', dest='ssl_verify_mode', required=False, default=None,
+                    help='Whether to try to verify other peers certificates and how to behave if verification fails. Valid values are: ssl.CERT_NONE, ssl.CERT_OPTIONAL, ssl.CERT_REQUIRED. Default: None')
 
 
 args = parser.parse_args()
@@ -60,18 +58,22 @@ members = args.members
 is_present = args.is_present
 security_protocol = args.security_protocol
 sasl_mechanism = args.sasl_mechanism
-sasl_plain_username =args.sasl_plain_username
+sasl_plain_username = args.sasl_plain_username
 sasl_plain_password = args.sasl_plain_password
-ssl_check_hostname = args.ssl_check_hostname
-ssl_cafile = args.ssl_cafile
 ssl_certfile = args.ssl_certfile
 ssl_keyfile = args.ssl_keyfile
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
 ssl_context.load_cert_chain(ssl_certfile, ssl_keyfile)
+
 ssl_context.verify_mode = ssl.CERT_NONE
 
 if list_groups is True:
-    cg = KafkaConsumerGroups(bootstrap_server, security_protocol, sasl_mechanism, sasl_plain_username, sasl_plain_password, ssl_context, timeout)
+    if security_protocol in ['SASL_PLAINTEXT', 'SASL_SSL']:
+        cg = KafkaConsumerGroups(bootstrap_server, security_protocol, sasl_mechanism, sasl_plain_username, sasl_plain_password, ssl_context, timeout)
+    elif security_protocol in ['SSL']:
+        cg = KafkaConsumerGroups(bootstrap_server, security_protocol, ssl_context, timeout)
+    else:
+        cg = KafkaConsumerGroups(bootstrap_server, timeout)
     l = cg.list()
     zabbix_items = []
     for key, value in l.items():
@@ -80,17 +82,33 @@ if list_groups is True:
     print(json.dumps({"data": zabbix_items}, indent=4))
 elif group is not None:
     if lag is True:
-        cg = KafkaConsumerGroups(bootstrap_server, security_protocol, sasl_mechanism, sasl_plain_username, sasl_plain_password, ssl_context, timeout)
+        if security_protocol in ['SASL_PLAINTEXT', 'SASL_SSL']:
+            cg = KafkaConsumerGroups(bootstrap_server, security_protocol, sasl_mechanism, sasl_plain_username, sasl_plain_password, ssl_context, timeout)
+        elif security_protocol in ['SSL']:
+            cg = KafkaConsumerGroups(bootstrap_server, security_protocol, ssl_context, timeout)
+        else:
+            cg = KafkaConsumerGroups(bootstrap_server, timeout)
         l = cg.list()
         g = cg.describe(node_id=l[group], group_name=group)
         print(g["lag"])
     elif members is True:
-        cg = KafkaConsumerGroups(bootstrap_server, security_protocol, sasl_mechanism, sasl_plain_username, sasl_plain_password, ssl_context, timeout)
+        if security_protocol in ['SASL_PLAINTEXT', 'SASL_SSL']:
+            cg = KafkaConsumerGroups(bootstrap_server, security_protocol, sasl_mechanism, sasl_plain_username, sasl_plain_password, ssl_context, timeout)
+        elif security_protocol in ['SSL']:
+            cg = KafkaConsumerGroups(bootstrap_server, security_protocol, ssl_context, timeout)
+
+        else:
+            cg = KafkaConsumerGroups(bootstrap_server, timeout)
         l = cg.list()
         members = cg.get_members(node_id=l[group], group_name=group)
         print(len(members))
     elif is_present is True:
-        cg = KafkaConsumerGroups(bootstrap_server, security_protocol, sasl_mechanism, sasl_plain_username, sasl_plain_password, ssl_context, timeout)
+        if security_protocol in ['SASL_PLAINTEXT', 'SASL_SSL']:
+            cg = KafkaConsumerGroups(bootstrap_server, security_protocol, sasl_mechanism, sasl_plain_username, sasl_plain_password, ssl_context, timeout)
+        elif security_protocol in ['SSL']:
+            cg = KafkaConsumerGroups(bootstrap_server, security_protocol, ssl_context, timeout)
+        else:
+            cg = KafkaConsumerGroups(bootstrap_server, timeout)
         l = cg.list()
         if group in l:
             print("1")
