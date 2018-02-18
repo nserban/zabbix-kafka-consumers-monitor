@@ -38,12 +38,19 @@ Monitor Kafka Consumer Groups
 
 optional arguments:
   -h, --help            show this help message and exit
-  --bootstrap-server BOOTSTRAP_SERVER
-                        Kafka brokers list
-  --list                List Kafka Consumer Groups
-  --group               CONSUMER_GROUP
+  --bootstrap-server    BOOTSTRAP_SERVER
+                          Kafka brokers list
+  --list                  List Kafka Consumer Groups
+  --group                 CONSUMER_GROUP
       --lag                 Lag consumer group
       --members             Members consumer group
       --is-present          Check if a consumer group exists
-  --timeout TIMEOUT     Kafka API timeout in ms
+  --timeout TIMEOUT       Kafka API timeout in ms
+  --security-protocol     Protocol used to communicate with brokers
+  --sasl-mechanism        SASL mechanism type
+  --sasl-plain-username   Username for SASL PLAIN authentication
+  --sasl-plain-password   Password for SASL PLAIN authentication
+  --ssl-certfile          Certificate file
+  --ssl-keyfile           Key file
+  --nocheckcertificate    Desactivate the verification of other peers certificates and hostname server
 ```

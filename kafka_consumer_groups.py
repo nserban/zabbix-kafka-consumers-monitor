@@ -3,7 +3,10 @@ from kafka.client_async import KafkaClient
 from kafka.protocol import admin
 import time
 import threading
+import ssl
 from kafka.protocol.group import MemberAssignment
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 '''
 This class retrieve all consumer groups and information about members and lag using Kafka API.
@@ -16,11 +19,23 @@ class KafkaConsumerGroups:
     kafka_brokers = None
     client = None
     timeout = None
+    security_protocol = None
+    sasl_mechanism = None
+    sasl_plain_username = None
+    sasl_plain_password = None
+    ssl_certfile = None
+    ssl_keyfile = None
+    ssl_context = None
 
-    def __init__(self, kafka_brokers, timeout=5000):
+    def __init__(self, kafka_brokers, security_protocol, sasl_mechanism, sasl_plain_username, sasl_plain_password, ssl_context, timeout=5000):
         self.kafka_brokers = kafka_brokers
-        self.client = KafkaClient(bootstrap_servers=kafka_brokers)
+        self.security_protocol = security_protocol
+        self.sasl_mechanism = sasl_mechanism
+        self.sasl_plain_username = sasl_plain_username
+        self.sasl_plain_password = sasl_plain_password
+        self.ssl_context = ssl_context
         self.timeout = timeout
+        self.client = KafkaClient(bootstrap_servers=kafka_brokers, security_protocol=security_protocol, sasl_mechanism=sasl_mechanism, sasl_plain_username=sasl_plain_username, sasl_plain_password=sasl_plain_password, ssl_context=ssl_context, timeout=timeout)
         self.lag_topics_found = []
         self.lag_total = 0
 
@@ -139,6 +154,11 @@ class KafkaConsumerGroups:
         consumer = KafkaConsumer(
             bootstrap_servers=self.kafka_brokers,
             group_id=group_name,
+            security_protocol=self.security_protocol,
+            sasl_mechanism=self.sasl_mechanism,
+            sasl_plain_username=self.sasl_plain_username,
+            sasl_plain_password=self.sasl_plain_password,
+            ssl_context=self.ssl_context
         )
         partitions_per_topic = consumer.partitions_for_topic(topic)
 
