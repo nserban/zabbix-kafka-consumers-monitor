@@ -5,8 +5,8 @@ import time
 import threading
 import ssl
 from kafka.protocol.group import MemberAssignment
-import logging
-logging.basicConfig(level=logging.DEBUG)
+#import logging
+#logging.basicConfig(level=logging.DEBUG)
 
 '''
 This class retrieve all consumer groups and information about members and lag using Kafka API.
