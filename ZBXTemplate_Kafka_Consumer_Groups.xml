@@ -145,7 +145,7 @@
                             <name>{#CONSUMER_GROUP} Lag it to high ({ITEM.LASTVALUE})</name>
                             <correlation_mode>0</correlation_mode>
                             <correlation_tag/>
-                            <url>https://admin.algo.travel/wiki/Setup_Kafka_Server#Monitoring</url>
+                            <url></url>
                             <status>0</status>
                             <priority>3</priority>
                             <description/>
@@ -161,7 +161,7 @@
                             <name>{#CONSUMER_GROUP} Number of Members is Zero ({ITEM.LASTVALUE})</name>
                             <correlation_mode>0</correlation_mode>
                             <correlation_tag/>
-                            <url>https://admin.algo.travel/wiki/Setup_Kafka_Server#Monitoring</url>
+                            <url></url>
                             <status>0</status>
                             <priority>3</priority>
                             <description>Check EMR application</description>
